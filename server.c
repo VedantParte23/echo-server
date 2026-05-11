@@ -16,7 +16,7 @@ int main(int argc, char const *argv[])
 
     struct addrinfo hints, *res;
     int sockfd, status;
-    char ipstr[INET6_ADDRSTRLEN];
+    
 
     struct sockaddr_storage their_storage;
     socklen_t addr_size;
@@ -32,31 +32,50 @@ int main(int argc, char const *argv[])
         printf("Error");
     }
 
+    // socket
     sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 
-    printf("\n\n%d\n", sockfd);
+    // bind
     int yes = 1;
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);
 
     bind(sockfd, res->ai_addr, res->ai_addrlen);
 
+    // listen
     listen(sockfd, 10);
 
+    // accept
     int accept_fd;
-
     accept_fd = accept(sockfd, (struct sockaddr *)&their_storage, &addr_size);
-
-    long int byte_send;
-
-    char * message = "HIi darling";
-    int len;
-    len = strlen(message);
-
-    byte_send = send(accept_fd, message,len, 0);
-
+    while (1)
+    {
+        
+    
+    
+    
+        //recv
+        char recv_buff[1024]; 
+        ssize_t recv_bytes;
+    
+        recv_bytes = recv(accept_fd, recv_buff, sizeof(recv_buff) - 1, 0);
+    
+        if (recv_bytes > 0)
+        {
+            recv_buff[recv_bytes] = '\0'; // null-terminate
+            printf("%s\n",recv_buff);
+        }
+    
+    
+        // send section
+        ssize_t  byte_send;
+    
+        ssize_t len = sizeof(recv_buff);
+    
+        byte_send = send(accept_fd, recv_buff, recv_bytes, 0);
+    
+        
+    }    
     close(accept_fd);
-
-
-
+    
     return 0;
 }
